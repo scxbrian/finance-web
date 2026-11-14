@@ -24,3 +24,27 @@ export function formatMonth(month) {
   const [year, mon] = month.split("-").map(Number);
   return new Date(year, mon - 1, 1).toLocaleDateString("en-KE", { month: "long", year: "numeric" });
 }
+
+function parseISO(iso) {
+  const [year, mon, day] = iso.split("-").map(Number);
+  return new Date(year, mon - 1, day); // local midnight, so no UTC shift
+}
+
+// formatDay("2026-11-14") -> "14 Nov"
+export function formatDay(iso) {
+  return parseISO(iso).toLocaleDateString("en-KE", { day: "numeric", month: "short" });
+}
+
+// formatRange("2026-11-01", "2026-11-15") -> "1–15 Nov"
+export function formatRange(fromISO, toISO) {
+  const from = parseISO(fromISO);
+  const to = parseISO(toISO);
+  const sameMonth = from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth();
+
+  if (sameMonth) {
+    if (from.getDate() === to.getDate()) return formatDay(toISO);
+    const month = to.toLocaleDateString("en-KE", { month: "short" });
+    return `${from.getDate()}–${to.getDate()} ${month}`;
+  }
+  return `${formatDay(fromISO)} – ${formatDay(toISO)}`;
+}

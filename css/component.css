@@ -246,3 +246,159 @@
   background: var(--neg-wash);
   color: var(--neg-ink);
 }
+
+/* ---------- Home screen pieces ---------- */
+
+.eyebrow {
+  color: var(--ink-3);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+/* A swipeable row of cards on phones, with the next card peeking in as a hint. */
+.strip {
+  display: flex;
+  gap: var(--s-3);
+  margin-inline: calc(var(--s-4) * -1);
+  padding: 0 var(--s-4) var(--s-2);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--s-4);
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.strip > * {
+  flex: 0 0 min(15rem, 68%);
+  scroll-snap-align: start;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s-2);
+}
+
+.action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.action .tile {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+}
+
+.action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+}
+
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+
+.row-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.row-title,
+.row-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-title {
+  font-weight: 700;
+}
+
+.row-meta {
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+.amount {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.amount[data-tone="pos"] {
+  color: var(--pos-ink);
+}
+
+.amount[data-tone="neg"] {
+  color: var(--neg-ink);
+}
+
+.skeleton {
+  border-radius: var(--r-card);
+  background: var(--surface);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton--hero {
+  height: 7.5rem;
+}
+
+.skeleton--strip {
+  height: 8rem;
+}
+
+.skeleton--card {
+  height: 14rem;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (min-width: 900px) {
+  /* Enough room for all three cards at once, so the swipe row becomes a grid. */
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-inline: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .strip > * {
+    flex: initial;
+  }
+}

@@ -5,5 +5,5 @@ window.FINANCE_CONFIG = {
 
   // Development only. When true the app reads mocks/dev-data.json
   // instead of calling the API. It never switches on by itself.
-  useMocks: false,
+  useMocks: true,
 };
