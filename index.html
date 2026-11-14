@@ -11,6 +11,7 @@
   <!-- Must stay first and blocking: sets data-theme before first paint. -->
   <script src="js/theme-boot.js"></script>
 
+  <link rel="preload" href="assets/fonts/manrope-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -23,28 +24,39 @@
     <!-- Sidebar on desktop, bottom bar on phones. Same elements, restyled by CSS. -->
     <aside class="sidebar">
       <div class="brand">
-        <span class="brand-name">Finance Tracker</span>
-        <span id="conn-status" class="conn" data-state="unknown">Checking…</span>
+  <span class="brand-name">Finance Tracker</span>
       </div>
+    <header class="topbar">
+  <h1 id="page-title" class="page-title">Home</h1>
+  <div id="topbar-controls" class="topbar-controls"></div>
+  <span id="conn-status" class="conn" data-state="unknown">Checking…</span>
+  <button type="button" id="theme-toggle" class="icon-btn" aria-label="Switch theme">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#contrast"></use></svg>
+  </button>
+</header>
 
-      <nav class="nav" aria-label="Primary">
-        <a href="#overview" class="nav-link" data-route="overview">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#home"></use></svg>
-          <span>Overview</span>
-        </a>
-        <a href="#ledger" class="nav-link" data-route="ledger">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#list"></use></svg>
-          <span>Ledger</span>
-        </a>
-        <a href="#scan" class="nav-link" data-route="scan">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#camera"></use></svg>
-          <span>Scan</span>
-        </a>
-        <a href="#insights" class="nav-link" data-route="insights">
-          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#chart"></use></svg>
-          <span>Insights</span>
-        </a>
-      </nav>
+        <nav class="nav" aria-label="Primary">
+  <a href="#overview" class="nav-link" data-route="overview">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#home"></use></svg>
+    <span>Home</span>
+  </a>
+  <a href="#ledger" class="nav-link" data-route="ledger">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#list"></use></svg>
+    <span>Ledger</span>
+  </a>
+  <a href="#scan" class="nav-link" data-route="scan">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#camera"></use></svg>
+    <span>Scan</span>
+  </a>
+  <a href="#insights" class="nav-link" data-route="insights">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#chart"></use></svg>
+    <span>Insights</span>
+  </a>
+  <a href="#scores" class="nav-link" data-route="scores">
+    <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#gauge"></use></svg>
+    <span>Scores</span>
+  </a>
+</nav>
 
       <div class="sidebar-actions">
         <button type="button" id="add-btn" class="btn btn-primary">

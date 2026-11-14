@@ -1,0 +1,100 @@
+/* Design tokens. Every colour, size and shadow lives here and nowhere else,
+   so a rebrand or a dark-mode fix is an edit to this one file. */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces. --bg is also read by js/components/theme.js for the browser chrome. */
+  --bg: #ecebf3;
+  --surface: #ffffff;
+  --surface-2: #f4f4f9;
+  --line: #e3e2ec;
+
+  /* Text. --ink also fills the primary button and the active nav pill. */
+  --ink: #111118;
+  --on-ink: #ffffff;
+  --ink-2: #4d4d5e;
+  --ink-3: #6b6b7e;
+
+  /* The accent is for data only: charts, the score gauge, progress fills. */
+  --accent: #6b6fe4;
+  --accent-wash: #e9e9fb;
+
+  /* Money direction. The -ink variants are for text, the plain ones for fills. */
+  --pos: #16a34a;
+  --pos-ink: #0b7a3c;
+  --pos-wash: #e3f5ea;
+  --neg: #e5484d;
+  --neg-ink: #c42b31;
+  --neg-wash: #fdeaea;
+  --warn: #d99a1b;
+  --warn-ink: #7a5200;
+  --warn-wash: #fff3d6;
+
+  --track: #d9d8e4; /* the hatching on empty progress tracks */
+
+  /* Shape */
+  --r-card: 20px;
+  --r-tile: 12px;
+  --r-pill: 999px;
+
+  /* Depth */
+  --shadow-card: 0 1px 2px rgb(17 17 24 / 0.04), 0 8px 24px rgb(17 17 24 / 0.05);
+  --shadow-tile: 0 1px 2px rgb(17 17 24 / 0.06), 0 2px 8px rgb(17 17 24 / 0.05);
+  --shadow-nav: 0 2px 6px rgb(17 17 24 / 0.06), 0 12px 32px rgb(17 17 24 / 0.1);
+
+  /* Type */
+  --font: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.8125rem;
+  --fs-base: 0.9375rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.5rem;
+  --fs-2xl: 2.125rem;
+
+  /* Space, in 4px steps */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+
+  --nav-h: 64px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg: #0e0e13;
+  --surface: #17171f;
+  --surface-2: #20202b;
+  --line: #2a2a37;
+
+  /* The ink pair inverts, so the active pill and primary button stay high-contrast. */
+  --ink: #f2f2f7;
+  --on-ink: #111118;
+  --ink-2: #c3c3d2;
+  --ink-3: #9a9aad;
+
+  --accent: #8e91f0;
+  --accent-wash: #25263f;
+
+  --pos: #34d07a;
+  --pos-ink: #5fe39a;
+  --pos-wash: #12301f;
+  --neg: #f0686d;
+  --neg-ink: #ff8c90;
+  --neg-wash: #3a1a1c;
+  --warn: #e8b13c;
+  --warn-ink: #f0c668;
+  --warn-wash: #33290f;
+
+  --track: #2f2f3d;
+
+  /* Shadows vanish on dark backgrounds, so depth comes from a faint edge instead. */
+  --shadow-card: 0 0 0 1px rgb(255 255 255 / 0.05);
+  --shadow-tile: 0 0 0 1px rgb(255 255 255 / 0.07);
+  --shadow-nav: 0 12px 32px rgb(0 0 0 / 0.55), 0 0 0 1px rgb(255 255 255 / 0.07);
+}

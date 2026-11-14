@@ -1,0 +1,248 @@
+/* ---------- Surfaces ---------- */
+
+.card {
+  padding: var(--s-4);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.card-title {
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+.card-link {
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* The small rounded icon square that leads every stat card. */
+.tile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-tile);
+  background: var(--surface);
+  box-shadow: var(--shadow-tile);
+  color: var(--ink);
+}
+
+/* ---------- Stat: icon tile + label, a number, and a delta underneath ---------- */
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.stat-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.stat-value--hero {
+  font-size: var(--fs-2xl);
+}
+
+.stat-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+
+/* The arrow shows direction; data-tone shows whether that direction is good. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 6px;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip .icon {
+  width: 12px;
+  height: 12px;
+}
+
+.chip[data-tone="pos"] {
+  background: var(--pos-wash);
+  color: var(--pos-ink);
+}
+
+.chip[data-tone="neg"] {
+  background: var(--neg-wash);
+  color: var(--neg-ink);
+}
+
+.chip[data-tone="flat"] {
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+
+/* ---------- Progress track: the unfilled part is hatched ---------- */
+
+.track {
+  height: 12px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: repeating-linear-gradient(135deg, var(--track) 0 2px, transparent 2px 6px);
+}
+
+.track-fill {
+  width: var(--value, 0%);
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+}
+
+.track-fill[data-tone="pos"] {
+  background: var(--pos);
+}
+
+.track-fill[data-tone="neg"] {
+  background: var(--neg);
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  height: 44px;
+  padding: 0 var(--s-5);
+  border: 0;
+  border-radius: var(--r-pill);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.btn-soft {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--r-tile);
+  background: var(--surface);
+  box-shadow: var(--shadow-tile);
+  color: var(--ink);
+}
+
+/* ---------- Connection status ---------- */
+
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-tile);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.conn::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-3);
+}
+
+.conn[data-state="online"]::before {
+  background: var(--pos);
+}
+
+.conn[data-state="offline"]::before {
+  background: var(--neg);
+}
+
+.conn[data-state="unconfigured"]::before {
+  background: var(--warn);
+}
+
+.conn[data-state="mock"]::before {
+  background: var(--accent);
+}
+
+/* ---------- Notices (empty states, warnings, errors) ---------- */
+
+.notice {
+  padding: var(--s-5);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.notice-title {
+  margin-bottom: var(--s-1);
+  font-size: var(--fs-base);
+}
+
+.notice[data-tone="warn"] {
+  background: var(--warn-wash);
+  color: var(--warn-ink);
+}
+
+.notice[data-tone="error"] {
+  background: var(--neg-wash);
+  color: var(--neg-ink);
+}
