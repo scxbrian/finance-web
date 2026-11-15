@@ -53,14 +53,18 @@ it should never be relied on.
 
 ### Authentication and cross-origin requests
 
-The API uses a session cookie, so the frontend sends `credentials: "include"` on
-every request. For that to work the API must answer with
-`Access-Control-Allow-Origin` set to the exact frontend origin (a `*` wildcard
-is rejected by browsers when credentials are involved) and
-`Access-Control-Allow-Credentials: true`. A request without a valid session gets
-`401` with code `unauthorized`. The sign-in endpoints are specified when the
-authentication batch is built; until then every endpoint below is assumed
-reachable.
+In production the browser never calls this API directly. The frontend host
+(Vercel) proxies `/api/*` to the API, so every request is same-origin and the
+session cookie is first-party. There is therefore no CORS in production. (A
+cookie cannot be shared between two unrelated domains: Brave and Safari block
+third-party cookies by default.) In local development the frontend and API run
+on different ports of localhost, which browsers treat as same-site, so cookies
+still work and the API allows the development origin explicitly.
+
+Because a CDN sits in the path, the API sends `Cache-Control: no-store` on
+every response. Phone-side SMS forwarders do not use the browser path: they
+call the API's public address directly and authenticate with a per-user ingest
+token. A request without a valid session gets `401` with code `unauthorized`.
 
 ### No version prefix
 
