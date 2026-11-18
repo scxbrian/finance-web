@@ -163,3 +163,24 @@ sequential waits are noticeably slower than one.
 Ledger listing and filtering, creating and reversing transactions, receipt
 upload and review, SMS and statement ingestion, scores, and authentication. Each
 gets a section here before the frontend or the backend starts on it.
+
+### Changes to GET /api/overview
+
+- Each row in `recent_transactions` gains `fee_minor` (integer, 0 when there is no fee).
+  For an expense, `amount_minor` is everything that left the account, fee included.
+- `accounts[].type` may also be `liability` or `other`. Money market funds are reported as `savings`.
+- Balances are as of the end of today (Nairobi). Entries dated later are not included yet.
+- `recent_transactions` covers the period, so for the current month it ends today.
+
+### GET /api/transactions
+
+Query: `month` (YYYY-MM, default current), `kind` (income, expense, transfer, opening,
+adjustment), `account` (id), `category` (name), `q` (text, matched in title and note,
+case-insensitive), `limit` (1-200, default 100), `offset` (default 0).
+
+Unlike the overview, a list covers the WHOLE month, including days after today, so
+something dated tomorrow is visible. Newest first. `total` counts everything matching
+the filters, not only this page.
+
+    { "month": "2026-11", "period": { "from": "2026-11-01", "to": "2026-11-30" },
+      "total": 6, "transactions": [ ...same row shape as recent_transactions... ] }
