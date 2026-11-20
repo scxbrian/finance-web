@@ -402,3 +402,187 @@
     flex: initial;
   }
 }
+
+/* ---------- Signed-out state: only the sign-in card is shown ---------- */
+
+body[data-auth="loading"] .shell {
+  visibility: hidden; /* until the app knows who is signed in, show nothing rather than the wrong screen */
+}
+
+body[data-auth="out"] .sidebar,
+body[data-auth="out"] .topbar {
+  display: none;
+}
+
+body[data-auth="out"] .shell {
+  display: block;
+}
+
+body[data-auth="out"] .workspace {
+  padding-bottom: 0;
+}
+
+body[data-auth="out"] .content {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+}
+
+/* Each screen lives in its own container (see js/router.js). */
+.view-root {
+  width: 100%;
+}
+
+body[data-auth="out"] .view-root {
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+  width: min(26rem, 100%);
+  padding: var(--s-6);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.login-card h1 {
+  font-size: var(--fs-xl);
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Form fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.input {
+  height: 48px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-tile);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 1rem; /* 16px or more: below that, iPhone Safari zooms the page when a field is focused */
+  font-weight: 600;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.form-error {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-tile);
+  background: var(--neg-wash);
+  color: var(--neg-ink);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ---------- Month picker (in the top bar) ---------- */
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.month-label {
+  min-width: 9rem;
+  text-align: center;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+/* ---------- Ledger ---------- */
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin-bottom: var(--s-4);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.chip-btn {
+  height: 36px;
+  padding: 0 var(--s-4);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.chip-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.day-title {
+  margin: var(--s-4) 0 var(--s-1);
+  color: var(--ink-3);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.day:first-child .day-title {
+  margin-top: 0;
+}
+
+#ledger-more {
+  margin-top: var(--s-4);
+}
+
+/* ---------- Toast ---------- */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + var(--s-8) + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  max-width: min(28rem, calc(100% - 2rem));
+  padding: var(--s-3) var(--s-5);
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  color: var(--on-ink);
+  box-shadow: var(--shadow-nav);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  transform: translateX(-50%);
+}
+
+@media (min-width: 900px) {
+  .toast {
+    bottom: var(--s-8);
+  }
+}

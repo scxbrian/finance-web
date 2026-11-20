@@ -48,3 +48,8 @@ export function formatRange(fromISO, toISO) {
   }
   return `${formatDay(fromISO)} – ${formatDay(toISO)}`;
 }
+
+// formatDayLong("2026-11-14") -> "Sat, 14 Nov" (the heading above each day in the ledger)
+export function formatDayLong(iso) {
+  return parseISO(iso).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "short" });
+}

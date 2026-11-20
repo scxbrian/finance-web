@@ -13,9 +13,21 @@
 
 .topbar {
   display: flex;
+  flex-wrap: wrap; /* the month picker drops to its own row on a phone */
   align-items: center;
   gap: var(--s-3);
   padding: calc(var(--s-4) + env(safe-area-inset-top, 0px)) var(--s-4) var(--s-2);
+}
+
+.topbar-controls {
+  order: 10;
+  flex: 1 0 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.topbar-controls:empty {
+  display: none;
 }
 
 .page-title {
@@ -137,6 +149,11 @@
 
   .topbar {
     padding: var(--s-6) var(--s-8) var(--s-2);
+  }
+
+  .topbar-controls {
+    order: 0;
+    flex: 0 0 auto;
   }
 
   .content {

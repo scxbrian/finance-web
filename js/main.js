@@ -1,5 +1,8 @@
 import { $ } from "./lib/dom.js";
 import { initTheme } from "./components/theme.js";
+import { showToast } from "./components/toast.js";
+import { mocksEnabled } from "./api/client.js";
+import { fetchSession, signOut } from "./api/auth.js";
 import { checkConnection } from "./api/health.js";
 import { getState, setState, subscribe } from "./state.js";
 import { startRouter } from "./router.js";
@@ -26,14 +29,45 @@ async function refreshConnection() {
   setState({ connection: await checkConnection() });
 }
 
-initTheme($("#theme-toggle"));
-bindConnectionStatus();
-startRouter({
-  outlet: $("#view"),
-  titleEl: $("#page-title"),
-  announcer: $("#route-announcer"),
-});
+async function onSignOut() {
+  try {
+    await signOut();
+  } catch (err) {
+    showToast(err.message); // still signed in: say why, do not pretend
+    return;
+  }
+  setState({ user: null });
+}
 
-refreshConnection();
-window.addEventListener("online", refreshConnection);
-window.addEventListener("offline", refreshConnection);
+async function boot() {
+  initTheme($("#theme-toggle"));
+  bindConnectionStatus();
+
+  // A session that ended (expired, revoked, signed out elsewhere) sends you to the sign-in screen.
+  window.addEventListener("api:unauthorized", () => setState({ user: null }));
+  const paintAuth = ({ user }) => {
+    document.body.dataset.auth = user ? "in" : "out";
+  };
+  subscribe(paintAuth);
+
+  // Ask who is signed in BEFORE the first screen, so nobody sees a flash of the wrong one.
+  setState({ user: await fetchSession() });
+  paintAuth(getState());
+
+  const signOutButton = $("#sign-out");
+  signOutButton.addEventListener("click", onSignOut);
+  signOutButton.hidden = mocksEnabled(); // mock mode has no real session to end
+
+  startRouter({
+    outlet: $("#view"),
+    titleEl: $("#page-title"),
+    announcer: $("#route-announcer"),
+    controlsEl: $("#topbar-controls"),
+  });
+
+  refreshConnection();
+  window.addEventListener("online", refreshConnection);
+  window.addEventListener("offline", refreshConnection);
+}
+
+boot();

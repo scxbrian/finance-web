@@ -12,6 +12,13 @@ export class ApiError extends Error {
 
 const config = () => window.FINANCE_CONFIG || {};
 
+// Mock data is for local development only. A deployed site ignores `useMocks`, so a forgotten
+// `useMocks: true` can never show fake balances to a real visitor.
+const LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
+export function mocksEnabled() {
+  return Boolean(config().useMocks) && LOCAL_HOSTS.includes(location.hostname);
+}
+
 export const isAbort = (err) => err?.name === "AbortError";
 
 function messageFrom(data) {
@@ -23,10 +30,10 @@ function messageFrom(data) {
 }
 
 export async function request(path, { method = "GET", query, body, signal, timeoutMs = 10000 } = {}) {
-  const { apiBase, useMocks } = config();
+  const { apiBase } = config();
 
-  if (useMocks) {
-    // Loaded only on demand, so mock code never ships in a production session.
+  if (mocksEnabled()) {
+    // Loaded only on demand, so mock code never runs in a production session.
     const { mockRequest } = await import("./mock.js");
     return mockRequest(method, path);
   }
@@ -34,7 +41,10 @@ export async function request(path, { method = "GET", query, body, signal, timeo
     throw new ApiError("No backend is configured. Set apiBase in js/config.js.", { code: "not_configured" });
   }
 
-  const url = new URL(`/api${path}`, apiBase);
+  // "same-origin" is the normal deployed setup: the page's own host proxies /api to the server,
+  // so the browser only ever talks to one origin and the session cookie is first-party.
+  const base = apiBase === "same-origin" ? location.origin : apiBase;
+  const url = new URL(`/api${path}`, base);
   for (const [key, value] of Object.entries(query || {})) {
     if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
   }
@@ -55,7 +65,7 @@ export async function request(path, { method = "GET", query, body, signal, timeo
   try {
     response = await fetch(url, {
       method,
-      credentials: "include", // send the session cookie to the API's origin
+      credentials: "include", // send the session cookie
       headers: {
         Accept: "application/json",
         ...(body !== undefined && { "Content-Type": "application/json" }),
@@ -74,7 +84,10 @@ export async function request(path, { method = "GET", query, body, signal, timeo
     signal?.removeEventListener("abort", onCallerAbort);
   }
 
-  if (response.status === 401) window.dispatchEvent(new CustomEvent("api:unauthorized"));
+  // A wrong password is also a 401, but that is an answer to a question, not a lost session.
+  if (response.status === 401 && path !== "/auth/login") {
+    window.dispatchEvent(new CustomEvent("api:unauthorized"));
+  }
   if (response.status === 204) return null;
 
   let data = null;

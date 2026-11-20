@@ -1,11 +1,9 @@
-/* A deliberately tiny shared store: only things more than one part of the page
-   cares about. Each screen fetches and owns its own data. */
-
 import { currentMonth } from "./lib/dates.js";
 
 const state = {
   month: currentMonth(),   // the month the user is looking at
   connection: "unknown",   // unknown | online | offline | unconfigured | mock
+  user: null,              // the signed-in person, or null
 };
 
 const listeners = new Set();
@@ -21,7 +19,6 @@ export function setState(patch) {
   listeners.forEach((listener) => listener(snapshot, changed));
 }
 
-// Returns an unsubscribe function.
 export function subscribe(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);

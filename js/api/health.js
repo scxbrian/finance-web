@@ -1,8 +1,8 @@
-import { api } from "./client.js";
+import { api, mocksEnabled } from "./client.js";
 
 // Resolves to a connection state, never throws.
 export async function checkConnection() {
-  if (window.FINANCE_CONFIG?.useMocks) return "mock";
+  if (mocksEnabled()) return "mock";
   try {
     await api.get("/health", { timeoutMs: 5000 });
     return "online";

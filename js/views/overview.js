@@ -104,7 +104,7 @@ function quickActions() {
 
 function accountsCard(accounts) {
   if (accounts.length === 0) {
-    return notice({ title: "No accounts yet", body: "Add M-Pesa, a bank account or cash to start tracking balances." });
+        return notice({ title: "No accounts yet", body: "Accounts appear here as your transactions come in." });
   }
   return html`
     <section class="card" aria-labelledby="acc-title">

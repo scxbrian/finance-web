@@ -17,7 +17,8 @@
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/components.css">
 </head>
-<body>
+<!-- data-auth: "loading" until the app knows whether you are signed in, then "in" or "out". -->
+<body data-auth="loading">
   <a class="skip-link" href="#view">Skip to content</a>
 
   <div class="shell">
@@ -66,9 +67,12 @@
         <button type="button" id="theme-toggle" class="icon-btn" aria-label="Switch theme">
           <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#contrast"></use></svg>
         </button>
+        <button type="button" id="sign-out" class="icon-btn" aria-label="Sign out">
+          <svg class="icon" aria-hidden="true"><use href="assets/icons.svg#logout"></use></svg>
+        </button>
       </header>
 
-      <!-- Each view renders into this element. tabindex lets the router move focus here. -->
+      <!-- Each screen gets its own container inside here. tabindex lets the router move focus here. -->
       <main id="view" class="content" tabindex="-1"></main>
     </div>
   </div>
