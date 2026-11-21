@@ -97,3 +97,20 @@ test("mock mode works on a local host but is ignored on a deployed one", () => {
   installBrowser({ hostname: "finance-web.vercel.app", config: { useMocks: true } });
   assert.equal(mocksEnabled(), false); // a forgotten useMocks can never show fake money to a visitor
 });
+
+test("a page host with no API behind it says so, instead of a bare status code", async () => {
+  globalThis.fetch = async () => ({ status: 405, ok: false, json: async () => { throw new Error("not json"); } });
+  await assert.rejects(api.post("/auth/login", { email: "a", password: "b" }), (e) => /no API behind it/.test(e.message) && e.status === 405);
+  globalThis.fetch = async () => ({ status: 404, ok: false, json: async () => { throw new Error("not json"); } });
+  await assert.rejects(api.get("/auth/me"), (e) => /no API behind it/.test(e.message));
+});
+
+test("with an explicit apiBase, or a real JSON error, the message is not replaced", async () => {
+  window.FINANCE_CONFIG.apiBase = "http://127.0.0.1:8001";
+  globalThis.fetch = async () => ({ status: 405, ok: false, json: async () => { throw new Error("not json"); } });
+  await assert.rejects(api.get("/x"), (e) => e.message === "Request failed (405).");
+
+  window.FINANCE_CONFIG.apiBase = "same-origin";
+  globalThis.fetch = async () => jsonResponse({ error: { code: "not_found", message: "Not found." } }, 404);
+  await assert.rejects(api.get("/x"), (e) => e.message === "Not found.");
+});

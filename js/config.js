@@ -8,5 +8,5 @@ window.FINANCE_CONFIG = {
 
   // Development only, and only honoured on localhost: reads mocks/dev-data.json instead of
   // calling the API. On a deployed site this setting is ignored, so it can never show fake data.
-  useMocks: false,
+  useMocks: true,
 };
