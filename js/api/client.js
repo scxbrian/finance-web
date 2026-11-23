@@ -98,7 +98,13 @@ export async function request(path, { method = "GET", query, body, signal, timeo
   }
 
   if (!response.ok) {
-    throw new ApiError(messageFrom(data) || `Request failed (${response.status}).`, {
+    // A 404/405 with no JSON body on "same-origin" means the page's own host has no /api at all
+    // (for example a plain local file server). Say so, instead of a bare status code.
+    const noApiHere =
+      apiBase === "same-origin" && data === null && (response.status === 404 || response.status === 405)
+        ? "This address has no API behind it. Deployed, the host forwards /api to the server. Locally, use mock data (see js/config.js)."
+        : "";
+    throw new ApiError(messageFrom(data) || noApiHere || `Request failed (${response.status}).`, {
       code: "http",
       status: response.status,
       details: data,
