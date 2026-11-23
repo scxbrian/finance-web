@@ -12,6 +12,9 @@
 }
 
 .topbar {
+  width: 100%;
+  max-width: 72rem; /* the same column as the content below it, so the title lines up with the cards */
+  margin-inline: auto;
   display: flex;
   flex-wrap: wrap; /* the month picker drops to its own row on a phone */
   align-items: center;
