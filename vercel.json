@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://pop-os.tail24046f.ts.net:8443/api/:path*"
+      "destination": "https://server.tail24046f.ts.net:8443/api/:path*"
     }
   ],
   "headers": [

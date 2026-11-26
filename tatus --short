@@ -1,0 +1,10 @@
+[33mcommit bae35ba86d0f6468b2e2667b7ce5d1e693cf4355[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Brian Kennedy <scxbrian@gmail.com>
+Date:   Mon Nov 23 09:26:20 2026 +0300
+
+    CSS FIXES
+
+ .gitattributes   |  1 [31m-[m
+ assets/icons.svg | 25 [32m++++++++++++[m[31m-------------[m
+ css/layout.css   |  3 [32m+++[m
+ 3 files changed, 15 insertions(+), 14 deletions(-)
