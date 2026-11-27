@@ -1,14 +1,15 @@
-# finance-web
+# senti-web
 
-The frontend of a personal finance tracker for Kenyan shillings: a ledger of
-income, spending and transfers across M-Pesa, bank and cash, with receipt
-scanning and monthly analysis. It is written in plain HTML, CSS and JavaScript
-with no framework and no build step, and it talks to a separate API.
+The frontend of **Senti**, a personal finance tracker for Kenyan shillings: a
+ledger of income, spending and transfers across M-Pesa, bank and cash, with
+receipt scanning and monthly analysis. It is written in plain HTML, CSS and
+JavaScript with no framework and no build step, and it talks to a separate API.
 
-The backend lives in its own repository: `finance-api`.
+The backend lives in its own repository: `senti-api`.
 
-**Status:** scaffolding. The structure below is the design; files appear as
-each part is built.
+**Status:** live and connected to `senti-api`. The responsive shell, light/dark
+theme boot, session-cookie sign-in, Senti branding (`sentisvg.svg`), and core
+views (`Home`, `Ledger`, `Scan`, `Insights`, `Scores`) are deployed on Vercel.
 
 ## Contents
 
@@ -31,13 +32,11 @@ a header and an empty content area. A small hash router watches the address bar
 Each view is its own JavaScript module that asks the API for data, builds its
 markup, and attaches its event handlers.
 
-```
- browser
-   |
-   |-- static files (Vercel): index.html, css/, js/
-   |
-   `-- fetch /api/... --> finance-api (self-hosted, behind HTTPS)
-```
+    browser
+      |
+      |-- static files (Vercel): index.html, css/, js/
+      |
+      `-- fetch /api/... --> senti-api (self-hosted, behind HTTPS)
 
 Every request goes through one module, `js/api/client.js`. Views never call
 `fetch` themselves, so base URL, credentials, timeouts and error handling live
@@ -45,40 +44,39 @@ in exactly one place.
 
 ## Repository layout
 
-```
-finance-web/
-├── index.html           # app shell only
-├── css/
-│   ├── tokens.css       # colours, type scale, spacing, both themes
-│   ├── base.css         # reset, typography, form controls
-│   ├── layout.css       # shell, sidebar, mobile bottom bar
-│   ├── components.css   # buttons, cards, sheet, toast, rows
-│   └── views/           # one stylesheet per screen
-├── js/
-│   ├── theme-boot.js    # sets the theme before first paint
-│   ├── config.js        # backend address, the only setting
-│   ├── main.js          # boot
-│   ├── router.js        # hash routing
-│   ├── state.js         # small shared store
-│   ├── api/             # client.js plus one module per API area
-│   ├── lib/             # money, dates, DOM helpers, image resizing
-│   ├── components/      # sheet, toast, charts, shared pieces
-│   └── views/           # one module per screen
-├── mocks/               # development data, never loaded in production
-├── assets/              # icon sprite, app icons
-├── docs/
-│   └── api-contract.md  # the agreement with finance-api
-└── README.md
-```
+    senti-web/
+    ├── index.html           # app shell only
+    ├── css/
+    │   ├── tokens.css       # colours, type scale, spacing, both themes
+    │   ├── base.css         # reset, typography, form controls
+    │   ├── layout.css       # shell, sidebar, mobile bottom bar, topbar logo
+    │   ├── components.css   # buttons, cards, sheet, toast, rows
+    │   └── views/           # one stylesheet per screen
+    ├── js/
+    │   ├── theme-boot.js    # sets the theme before first paint
+    │   ├── config.js        # backend address, the only setting
+    │   ├── main.js          # boot
+    │   ├── router.js        # hash routing
+    │   ├── state.js         # small shared store
+    │   ├── api/             # client.js plus one module per API area
+    │   ├── lib/             # money, dates, DOM helpers, image resizing
+    │   ├── components/      # sheet, toast, charts, shared pieces
+    │   └── views/           # one module per screen
+    ├── mocks/               # development data, never loaded in production
+    ├── assets/
+    │   ├── fonts/           # self-hosted Manrope font
+    │   ├── icons.svg        # icon sprite
+    │   └── sentisvg.svg     # Senti ribbon brand mark and favicon
+    ├── docs/
+    │   └── api-contract.md  # the agreement with senti-api
+    └── README.md
 
 ## Running it locally
 
 There is nothing to install. Browsers refuse to load ES modules from `file://`,
 so use any static server from the repository root:
 
-```
-python -m http.server 5500
-```
+    python -m http.server 5500
 
 Then open `http://localhost:5500`.
 
@@ -88,7 +86,7 @@ One file, `js/config.js`:
 
 | Setting     | Meaning                                                              |
 | ----------- | -------------------------------------------------------------------- |
-| `apiBase`   | Public HTTPS address of the API, no trailing slash.                  |
+| `apiBase`   | Public HTTPS address of `senti-api`, no trailing slash.              |
 | `useMocks`  | `true` reads `mocks/dev-data.json` instead of calling the API.       |
 
 With `apiBase` empty and `useMocks` false, the app reports that no backend is
@@ -118,7 +116,7 @@ no logic buried in the HTML.
 ### ES modules
 
 The portfolio site uses classic scripts because it is one small file. This app
-will have dozens of files, and a single global script does not scale to that.
+has dozens of files, and a single global script does not scale to that.
 ES modules give real imports and exports with no bundler. They need a static
 server locally, which is already part of the workflow, and they load normally
 from Vercel.
@@ -159,12 +157,10 @@ phone would flash white on every load.
   testing checklist matters.
 - The app depends on a self-hosted API. When the server is down the app says
   so, and writes made while offline are queued rather than lost (planned).
-- Sign-in is not designed yet. It will use a secure session cookie once the
-  backend's authentication exists.
 
 ## Deploying to Vercel
 
-1. Import the repository as a new project.
+1. Import `scxbrian/senti-web` as a project on Vercel.
 2. Set the framework preset to **Other** and leave the build command and output
    directory empty.
 3. Deploy. Pushes to `main` publish to production; other branches get preview
@@ -176,16 +172,20 @@ names exactly.
 
 ## Testing checklist
 
-- [ ] Renders correctly at about 375 px wide.
-- [ ] Both themes look right, with no flash on load.
-- [ ] Every navigation link opens its view and focus moves to the content.
+- [x] Renders correctly at about 375 px wide, with the Senti logo in the mobile topbar and desktop sidebar.
+- [x] Both themes look right, with no flash on load.
+- [x] Every navigation link opens its view and focus moves to the content.
+- [x] Sign-in and session cookies work cross-origin against `senti-api`.
 - [ ] With the API unreachable, an honest error is shown, not stale or fake data.
 - [ ] The whole app works from the keyboard alone.
 - [ ] No errors in the browser console on a normal load.
 
 ## Roadmap
 
-- Core views against mock data, then the real API.
-- Receipt scan and review flow.
-- Installable app (manifest and service worker) with an offline write queue.
-- Savings and spending scores with explanations.
+- [x] Core views (`Home`, `Ledger`, `Scan`, `Insights`, `Scores`) connected to `senti-api`.
+- [x] Senti brand identity (`sentisvg.svg`) across favicon, mobile topbar, and desktop rail.
+- [ ] First-run welcome / onboarding state and phone SMS forwarder setup guide.
+- [ ] Interactive manual entry, transfer, and paste-SMS sheets.
+- [ ] Balance mismatch flags from reported M-Pesa balances.
+- [ ] Receipt scan and review flow.
+- [ ] Installable app (manifest and service worker) with an offline write queue.
