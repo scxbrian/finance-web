@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs>
+    
+    <linearGradient id="topCap" x1="15%" y1="15%" x2="85%" y2="85%">
+      <stop offset="0%" stop-color="#29EB7E" />
+      <stop offset="55%" stop-color="#1ECA67" />
+      <stop offset="100%" stop-color="#119C50" />
+    </linearGradient>
+
+    
+    <linearGradient id="topRightFold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E934A" />
+      <stop offset="40%" stop-color="#1CC765" />
+      <stop offset="100%" stop-color="#26E479" />
+    </linearGradient>
+
+    
+    <linearGradient id="leftCurve" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#129E51" />
+      <stop offset="35%" stop-color="#25E278" />
+      <stop offset="100%" stop-color="#18BD60" />
+    </linearGradient>
+
+    
+    <linearGradient id="rightCurve" x1="15%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#19BF61" />
+      <stop offset="65%" stop-color="#26E579" />
+      <stop offset="100%" stop-color="#119B4F" />
+    </linearGradient>
+
+    
+    <linearGradient id="bottomCap" x1="85%" y1="85%" x2="15%" y2="15%">
+      <stop offset="0%" stop-color="#29EB7E" />
+      <stop offset="55%" stop-color="#1ECA67" />
+      <stop offset="100%" stop-color="#119C50" />
+    </linearGradient>
+
+    
+    <linearGradient id="bottomLeftArm" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#0E934A" />
+      <stop offset="45%" stop-color="#1DC966" />
+      <stop offset="100%" stop-color="#27E67A" />
+    </linearGradient>
+  </defs>
+
+  
+  <path d="M 65 44 C 52 57, 48 67, 48 80 C 48 94, 54 104, 67 117 L 89 139 L 119 139 L 86 106 C 78 98, 76 92, 76 85 C 76 79, 79 73, 86 66 Z" fill="url(#leftCurve)" />
+
+  
+  <path d="M 65 44 L 89 20 L 146 20 L 106 60 L 92 60 C 86 60, 81 62, 76 67 Z" fill="url(#topCap)" />
+
+  
+  <path d="M 146 20 L 182 56 L 182 88 L 146 88 L 146 60 L 106 60 Z" fill="url(#topRightFold)" />
+
+  
+  <path d="M 175 196 C 188 183, 192 173, 192 160 C 192 146, 186 136, 173 123 L 151 101 L 121 101 L 154 134 C 162 142, 164 148, 164 155 C 164 161, 161 167, 154 174 Z" fill="url(#rightCurve)" />
+
+  
+  <path d="M 175 196 L 151 220 L 94 220 L 134 180 L 148 180 C 154 180, 159 178, 164 173 Z" fill="url(#bottomCap)" />
+
+  
+  <path d="M 94 220 L 58 184 L 58 152 L 94 152 L 94 180 L 134 180 Z" fill="url(#bottomLeftArm)" />
+</svg>
