@@ -14,15 +14,22 @@ export async function render(outlet, { signal }) {
   setHTML(outlet, skeleton());
 
   let data;
+  let reconcileData = null;
   try {
-    data = await api.get("/overview", { query: { month: getState().month }, signal });
+    [data, reconcileData] = await Promise.all([
+      api.get("/overview", { query: { month: getState().month }, signal }),
+      api.get("/reconcile", { signal }).catch((err) => {
+        if (isAbort(err)) throw err;
+        return null;
+      }),
+    ]);
   } catch (err) {
     if (isAbort(err)) return; // navigated away; the router handles it
     throw err;                // anything else becomes an error notice
   }
   if (signal.aborted) return;
 
-  setHTML(outlet, page(data));
+  setHTML(outlet, page(data, reconcileData));
 }
 
 function skeleton() {
@@ -35,7 +42,7 @@ function skeleton() {
   `;
 }
 
-function page(d) {
+function page(d, reconcileData) {
   const basis = `vs ${formatRange(d.previous_period.from, d.previous_period.to)}`;
   const { summary } = d;
   const previous = summary.previous;
@@ -43,6 +50,8 @@ function page(d) {
   return html`
     <div class="stack">
       <p class="eyebrow">${formatMonth(d.month)} · ${formatRange(d.period.from, d.period.to)}</p>
+
+      ${reconciliationNotice(reconcileData)}
 
       <section class="card" aria-label="Total balance">
         <div class="stat">
@@ -136,4 +145,22 @@ function recentCard(transactions) {
         : html`<p class="eyebrow">Nothing recorded in this period yet.</p>`}
     </section>
   `;
+}
+
+function reconciliationNotice(reconcileData) {
+  const flagged = (reconcileData?.providers || []).filter((p) => Array.isArray(p.mismatches) && p.mismatches.length > 0);
+  if (flagged.length === 0) return "";
+
+  const parts = flagged.map((p) => {
+    const latest = p.mismatches[p.mismatches.length - 1];
+    const count = p.mismatches.length;
+    const label = p.provider.toUpperCase();
+    return `${label}: ${count} ${count === 1 ? "mismatch" : "mismatches"} (latest delta ${formatKES(latest.delta_minor, { sign: true })})`;
+  });
+
+  return notice({
+    tone: "warn",
+    title: "Balance discrepancy detected",
+    body: parts.join(" · "),
+  });
 }
