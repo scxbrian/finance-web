@@ -41,8 +41,9 @@ use UUIDs or integers internally; the frontend must not care.
 
 Any non-2xx response has this body:
 
-```json
+```
 { "error": { "code": "validation_error", "message": "Amount must be greater than zero.", "fields": { "amount_minor": "Must be greater than zero." } } }
+
 ```
 
 `code` is a stable machine-readable string, `message` is safe to show to a
@@ -62,9 +63,10 @@ on different ports of localhost, which browsers treat as same-site, so cookies
 still work and the API allows the development origin explicitly.
 
 Because a CDN sits in the path, the API sends `Cache-Control: no-store` on
-every response. Phone-side SMS forwarders do not use the browser path: they
-call the API's public address directly and authenticate with a per-user ingest
-token. A request without a valid session gets `401` with code `unauthorized`.
+every response. Phone-side SMS forwarders and native mobile clients do not use
+the browser path: they call the API's public address directly and authenticate
+with a bearer session token or a per-user ingest token. A request without a
+valid session gets `401` with code `unauthorized`.
 
 ### No version prefix
 
@@ -80,8 +82,9 @@ so breaking changes must ship backend-first.
 
 Used by the connection indicator. No authentication, no database access.
 
-```json
+```
 { "status": "ok" }
+
 ```
 
 ### GET /api/overview?month=YYYY-MM
@@ -94,26 +97,34 @@ sequential waits are noticeably slower than one.
 
 **What the numbers mean**
 
-- `period` is the span the summary covers. For the current month it ends today;
+* `period` is the span the summary covers. For the current month it ends today;
   for a past month it is the whole month.
-- `previous_period` is what the summary is compared against. Comparing a half-way
+
+* `previous_period` is what the summary is compared against. Comparing a half-way
   month to a whole previous month would make spending look like it fell by half,
   so for the current month the comparison covers the *same number of days* at the
   start of the previous month, clamped to that month's last day.
-- `income_minor` is money earned. Transfers between the user's own accounts and
+
+* `income_minor` is money earned. Transfers between the user's own accounts and
   opening balances are excluded, since neither is earning.
-- `expenses_minor` is everything spent, and it includes fees such as M-Pesa
+
+* `expenses_minor` is everything spent, and it includes fees such as M-Pesa
   transaction costs, because they are real costs.
-- `saved_minor` is income minus expenses. It can be negative.
-- `previous` is `null` when there is no earlier data to compare against, which is
+
+* `saved_minor` is income minus expenses. It can be negative.
+
+* `previous` is `null` when there is no earlier data to compare against, which is
   different from `0`.
-- `total_balance_minor` is the sum of every account's balance, as of now, and
-  does not depend on `month`.
-- `recent_transactions` holds at most five entries, newest first.
+
+* `total_balance_minor` is the sum of every account's balance, as of the end of
+  today (Nairobi), and does not depend on `month`. Entries dated later are not
+  included yet.
+
+* `recent_transactions` holds at most five entries within `period`, newest first.
 
 **Response**
 
-```json
+```
 {
   "month": "2026-11",
   "period": { "from": "2026-11-01", "to": "2026-11-15" },
@@ -139,6 +150,7 @@ sequential waits are noticeably slower than one.
       "kind": "expense",
       "title": "Naivas",
       "amount_minor": 234000,
+      "fee_minor": 0,
       "category": "Groceries",
       "account": { "id": "acc_mpesa", "name": "M-Pesa" },
       "to_account": null,
@@ -146,31 +158,19 @@ sequential waits are noticeably slower than one.
     }
   ]
 }
+
 ```
 
 **Fields**
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `accounts[].type` | string | `mpesa`, `bank`, `cash`, `savings`. The frontend uses it to pick an icon and falls back to a generic one for unknown values. |
-| `recent_transactions[].kind` | string | `income`, `expense`, `fee`, `transfer`. |
-| `recent_transactions[].category` | string or null | `null` for transfers. |
-| `recent_transactions[].to_account` | object or null | Set only when `kind` is `transfer`. |
-| `recent_transactions[].source` | string | `manual`, `receipt`, `sms`, `import`. |
-
-## Not yet specified
-
-Ledger listing and filtering, creating and reversing transactions, receipt
-upload and review, SMS and statement ingestion, scores, and authentication. Each
-gets a section here before the frontend or the backend starts on it.
-
-### Changes to GET /api/overview
-
-- Each row in `recent_transactions` gains `fee_minor` (integer, 0 when there is no fee).
-  For an expense, `amount_minor` is everything that left the account, fee included.
-- `accounts[].type` may also be `liability` or `other`. Money market funds are reported as `savings`.
-- Balances are as of the end of today (Nairobi). Entries dated later are not included yet.
-- `recent_transactions` covers the period, so for the current month it ends today.
+| Field | Type | Notes | 
+| ----- | ----- | ----- | 
+| `accounts[].type` | string | `mpesa`, `bank`, `cash`, `savings`, `liability`, `other`. Money market funds are reported as `savings`. The frontend uses it to pick an icon and falls back to a generic one for unknown values. | 
+| `recent_transactions[].kind` | string | `income`, `expense`, `fee`, `transfer`, `opening`, `adjustment`. | 
+| `recent_transactions[].category` | string or null | `null` for transfers and opening balances. | 
+| `recent_transactions[].fee_minor` | integer | `0` when there is no fee. For an expense, `amount_minor` is everything that left the account, fee included. | 
+| `recent_transactions[].to_account` | object or null | Set only when `kind` is `transfer`. | 
+| `recent_transactions[].source` | string | `manual`, `receipt`, `sms`, `import`. | 
 
 ### GET /api/transactions
 
@@ -182,5 +182,97 @@ Unlike the overview, a list covers the WHOLE month, including days after today, 
 something dated tomorrow is visible. Newest first. `total` counts everything matching
 the filters, not only this page.
 
-    { "month": "2026-11", "period": { "from": "2026-11-01", "to": "2026-11-30" },
-      "total": 6, "transactions": [ ...same row shape as recent_transactions... ] }
+```
+{ "month": "2026-11", "period": { "from": "2026-11-01", "to": "2026-11-30" },
+  "total": 6, "transactions": [ ...same row shape as recent_transactions... ] }
+
+```
+
+### GET /api/reconcile
+
+Query: `apply_opening` (boolean, default `false`).
+
+Checks chronological mobile-money and MMF messages against ledger running
+balances using `balance_after_minor`. When `apply_opening` is `true`, infers and
+records a balanced `opening` transaction paired with equity (`Opening Balances`)
+without mutating historical entries.
+
+```
+{
+  "providers": [
+    {
+      "provider": "mpesa",
+      "account_id": "acc_mpesa",
+      "opening_transaction_id": null,
+      "opening_balance_minor": 7900,
+      "checked_messages": 2,
+      "mismatches": []
+    }
+  ]
+}
+
+```
+
+## Not yet specified
+
+Creating and reversing transactions, receipt upload and review, SMS and
+statement ingestion, scores, and authentication. Each gets a section here
+before the frontend or the backend starts on it.
+
+### Features built
+
+* Ledger conventions: integer minor-unit (`_minor`) amounts, signed account
+  balances (`mpesa`, `bank`, `cash`, `savings`, `liability`, `other`), magnitude
+  `amount_minor` on transactions, `Africa/Nairobi` calendar dates (`YYYY-MM-DD`),
+  opaque string IDs, `Cache-Control: no-store`, and standard
+  `{ "error": { "code", "message", "fields" } }` error responses.
+
+* Endpoints: `GET /api/health`, `GET /api/overview?month=YYYY-MM` (with
+  same-elapsed-day comparison, `fee_minor` on `recent_transactions`, and MMFs
+  reported under `savings`), full-month filtered `GET /api/transactions`, and
+  `GET /api/reconcile`.
+
+### Features to be built
+
+* Statement and SMS ingestion: ephemeral in-memory (`io.BytesIO`) password-protected
+  M-Pesa PDF and bank statement import with zero disk persistence and
+  `"raw_file_purged": true` confirmation; multi-bank and multi-vendor parser
+  registry; Android SMS auto-parsing plus iOS Shortcut / paste-SMS / statement
+  workflows; receipt OCR upload and review.
+
+* Categorization and spend controls: recurring Pochi / Send Money / time-window
+  pattern prompts and per-user auto-tagging rules; liquidity sweep and fee
+  handling; "Safe-to-Spend Today" daily allowance; Kenyan budget generator and
+  payday auto-splitter; 30/90-day fee and Fuliza leak detection; crowdsourced
+  local vendor and item price comparison across supermarkets, restaurants,
+  pharmacies, hardware stores, and fuel spots.
+
+* Yields, splits and tax lens: Money Market Fund (MMF) daily net interest and
+  15% withholding tax (WHT) tracking with monthly balance sync; shareable
+  bill-split and Chama links with M-Pesa repayment matching; Kenyan statutory
+  tax and payslip decoder (`PAYE`, `SHIF`, `NSSF`, `AHL`, `16% VAT`, EPRA fuel
+  levies, `15%` MMF WHT).
+
+* Privacy and account controls: biometric lock, 1-tap balance masking,
+  JSON/CSV/PDF exports, live zero-retention audit log, and self-service account
+  and data deletion.
+
+### Changes needed in `api-contract.md`
+
+* Auth, sync and idempotency: add bearer session token authentication for
+  mobile/offline sync alongside session cookies, per-user SMS ingest tokens,
+  and `X-Idempotency-Key` / `client_tx_id` deduplication on write endpoints.
+
+* Transaction and account fields: add optional `occurred_at_time` (`HH:MM:SS` in
+  `Africa/Nairobi`), `counterparty_ref`, `counterparty_name`,
+  `tax_component_minor`, `tax_type` (`paye`, `shif`, `nssf`, `ahl`, `vat_16`,
+  `fuel_levy`, `wht_15`), rule/category `suggestion` hints on transactions, and
+  `annual_yield_bps` / `last_accrued_on` on `savings` (MMF) accounts.
+
+* Planned endpoints: specify endpoints for creating and reversing transactions,
+  ephemeral statement import (`POST /api/statements/import`), SMS ingestion,
+  receipt OCR review, Safe-to-Spend and budget planning, Kenyan tax/payslip
+  summary (`GET /api/tax/summary`), local price comparison
+  (`GET /api/catalog/compare`), bill/Chama splits (`POST /api/splits`,
+  `GET /api/splits/{share_token}`), privacy audit (`GET /api/privacy/audit`),
+  and account deletion (`DELETE /users/me`).

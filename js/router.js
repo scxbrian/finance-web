@@ -69,7 +69,7 @@ export function startRouter({ outlet, titleEl, announcer, controlsEl, table = ro
 
     markActive(name);
     titleEl.textContent = route.title;
-    document.title = `${route.title} · Finance Tracker`;
+    document.title = `${route.title} · Senti`;
     if (route.months) teardownMonths = mountMonthNav(controlsEl);
     outlet.setAttribute("aria-busy", "true");
 
